@@ -13,6 +13,8 @@ topics, probs = topic_model.fit_transform(data)
 from collections import Counter
 Counter(topics)
 # %%
+topic_model.topic_embeddings_.shape
+# %%
 total_topics = len(topic_model.get_topics())
 # %%
 probs.shape
@@ -79,9 +81,31 @@ topic_model.visualize_hierarchy()
 # %%
 topic_model.visualize_heatmap()
 # %%
+topic_model.visualize_distribution(probs[0], min_probability=0.001)
+# %%
 # topic_model.visualize_documents(list(df['in__title']))
 # %%
 topic_model.visualize_term_rank([0, 1, 2, 3])
 # %%
 
+# %% Calculate probabilities
+df_top_probs = pd.DataFrame([{'prob': p, 'topic': t} for t, p in zip(topics, probs)])
+# %%
+topic_0_indexes = df_top_probs[
+    (df_top_probs['prob'] >= 0.99) &
+    (df_top_probs['topic'] == 0)
+].index
+# %%
+topic_0_docs = list(df.iloc[topic_0_indexes]['in__title'])
+topic_0_docs
+# %%
+topic_0_embeddings = topic_model.embedding_model.embed(topic_0_docs)
+# %%
+topic_0_embeddings.shape
+# %%
+from sklearn.metrics.pairwise import cosine_similarity
+# %%
+cosine_similarity(topic_0_embeddings[:10])
+# %%
+cosine_similarity(topic_0_embeddings[:10], topic_model.topic_embeddings_)
 # %%
