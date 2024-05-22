@@ -3,12 +3,23 @@ from bertopic import BERTopic
 import pandas as pd
 # %%
 topic_model = BERTopic(
-    # calculate_probabilities=True
+    # language='spanish'
+    calculate_probabilities=True
 )
 # %%
 df = pd.read_parquet('data/df_joined_2024-04-01 00:00:00.paquet')
 data = list(df['in__title'])
+# %%
 topics, probs = topic_model.fit_transform(data)
+# %%
+doc_idx = 5
+doc_topic = probs[doc_idx].argsort()
+print(doc_topic)
+probs[doc_idx][doc_topic][::-1]
+# %%
+df_top_probs = pd.DataFrame([{'prob': p, 'topic': t} for t, p in zip(topics, probs)])
+# %%
+df_top_probs
 # %%
 from collections import Counter
 Counter(topics)
@@ -16,6 +27,7 @@ Counter(topics)
 topic_model.topic_embeddings_.shape
 # %%
 total_topics = len(topic_model.get_topics())
+total_topics
 # %%
 probs.shape
 # %%
@@ -33,7 +45,7 @@ print(len(topics))
 hierarchical_topics = topic_model.hierarchical_topics(data)
 hierarchical_topics
 # %%
-topic_model.get_topic(1)
+topic_model.get_topic(0)
 # %%
 topic_model.get_representative_docs(1)
 # %%
@@ -81,7 +93,7 @@ topic_model.visualize_hierarchy()
 # %%
 topic_model.visualize_heatmap()
 # %%
-topic_model.visualize_distribution(probs[0], min_probability=0.001)
+topic_model.visualize_distribution(probs[3], min_probability=0.001)
 # %%
 # topic_model.visualize_documents(list(df['in__title']))
 # %%
@@ -99,7 +111,8 @@ topic_0_indexes = df_top_probs[
 topic_0_docs = list(df.iloc[topic_0_indexes]['in__title'])
 topic_0_docs
 # %%
-topic_0_embeddings = topic_model.embedding_model.embed(topic_0_docs)
+# topic_0_embeddings = topic_model.embedding_model.embed(topic_0_docs)
+topic_0_embeddings = topic_model._extract_embeddings(topic_0_docs)
 # %%
 topic_0_embeddings.shape
 # %%
@@ -108,4 +121,25 @@ from sklearn.metrics.pairwise import cosine_similarity
 cosine_similarity(topic_0_embeddings[:10])
 # %%
 cosine_similarity(topic_0_embeddings[:10], topic_model.topic_embeddings_)
+# %%
+from transformers import pipeline
+classifier = pipeline(
+    "zero-shot-classification",
+    model="MoritzLaurer/mDeBERTa-v3-base-mnli-xnli"
+)
+# %%
+
+sequence_to_classify = "Angela Merkel ist eine Politikerin in Deutschland und Vorsitzende der CDU"
+candidate_labels = ["economy", "entertainment", "environment"]
+# %%
+output = classifier(
+    sequence_to_classify, candidate_labels,
+    multi_label=True
+)
+print(output)
+
+# %%
+output['labels']
+# %%
+output['scores']
 # %%
