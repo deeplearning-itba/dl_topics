@@ -21,7 +21,9 @@ df
 from collections import Counter
 entities = set(sum(list([list(e) for e in df['out__potential_entities'].values]), []))
 keywords = set(sum(list([list(e) for e in df['out__keywords_sorted'].values]), []))
-all_tokens =  list(entities.union(keywords))
+all_tokens = list(entities.union(keywords))
+# %%
+all_tokens
 # %%
 len(all_tokens)
 def tokenizer(sentence):
@@ -30,13 +32,13 @@ def tokenizer(sentence):
 tokenizer('Hola que tal')
 # %%
 tf_vectorizer = TfidfVectorizer(
-    tokenizer=tokenizer,
+    # tokenizer=tokenizer,
     # max_df=0.1,
     # min_df=10,
-    ngram_range=(1, 1),
+    ngram_range=(1, 3),
     stop_words=SPANISH_STOPWORDS,
-    lowercase=True,
-    # vocabulary=all_tokens,
+    lowercase=False,
+    vocabulary=all_tokens,
     # max_features=100_000
 )
 tf = tf_vectorizer.fit_transform(list(df['title_and_text']))
