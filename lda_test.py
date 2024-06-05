@@ -1,13 +1,20 @@
 # %%
 import pandas as pd
+import numpy as np
+import nltk
 from utils import plot_top_words
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation
+from nltk.corpus import stopwords
+
 # %%
 df = pd.read_parquet('data/df_joined_2024-04-01 00:00:00.paquet')
 # %%
+nltk.download('stopwords')
+
+# %%
 tf_vectorizer = CountVectorizer(
-    
+    stop_words=stopwords.words('spanish')
 )
 tf = tf_vectorizer.fit_transform(list(df['in__title']))
 # %%
@@ -26,7 +33,7 @@ lda.components_[:, 0]
 # %%
 plot_top_words(
     lda,
-    tf_vectorizer.get_feature_names(),
+    np.array(tf_vectorizer.get_feature_names()),
     10,
     'LDA Plot'
 )

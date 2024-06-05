@@ -1,6 +1,5 @@
 from matplotlib import pyplot as plt
 import pandas as pd
-import numpy as np
 
 SPANISH_STOPWORDS = list(pd.read_csv('data/spanish_stop_words.csv' )['stopwords'].values)
 
@@ -8,8 +7,7 @@ def plot_top_words(model, feature_names, n_top_words, title):
     fig, axes = plt.subplots(2, 5, figsize=(30, 15), sharex=True)
     axes = axes.flatten()
     for topic_idx, topic in enumerate(model.components_):
-        aux_idx = np.array(topic[-n_top_words:])
-        top_features_ind = np.argsort(aux_idx)
+        top_features_ind = topic.argsort()[-n_top_words:]
         top_features = feature_names[top_features_ind]
         weights = topic[top_features_ind]
 
