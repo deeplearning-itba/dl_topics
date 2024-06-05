@@ -25,7 +25,7 @@ lda.doc_topic_prior_
 # %%
 plot_top_words(
     lda,
-    tf_vectorizer.get_feature_names_out(),
+    tf_vectorizer.get_feature_names(),
     10,
     'LDA Plot'
 )
